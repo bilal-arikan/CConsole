@@ -32,8 +32,11 @@ namespace Arikan
     /// CommonConsole
     /// </summary>
     [AddComponentMenu("Arikan/CConsole")]
-    public class CConsole : SingletonBehaviour<CConsole>
+    public class CConsole : MonoBehaviour
     {
+    	public static CConsole Instance => _instance;
+    	private static CConsole _instance;
+
         const string CalledsFromConsoleLogPrefix = "%";
         const string ShowOnConsolePrefix = "> ";
         private GameObject UIObject;
@@ -90,9 +93,11 @@ namespace Arikan
         // If called in the non main thread, will return false;
         public static bool IsMainThread => System.Threading.Thread.CurrentThread.ManagedThreadId == mainThreadId;
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
+        	if(_instance == null)
+            	_instance = this;
+            	
             mainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
 
             if (!CmdInput)
@@ -300,7 +305,7 @@ namespace Arikan
             ActionsNoArg.Remove(cmd.ToLower());
 
             var btns = Instance.NoArgCmdButtonsgroup.GetComponentsInChildren<Button>();
-            var btn = btns.Find(b => b.name == cmd);
+            var btn = Array.Find(btns, b => b.name == cmd);
             if (btn)
                 Destroy(btn.gameObject);
         }
